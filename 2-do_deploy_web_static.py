@@ -1,60 +1,66 @@
 #!/usr/bin/python3
-""" This script defines a function do_deploy """
-from fabric.api import put, run, env, local
+""" deploying the web_static work using Fabric (for Python3)."""
+
+from fabric.api import env
+from fabric.context_managers import cd
+from fabric.api import run, put, local, settings
 from os.path import isfile
-from datetime import datetime
 
 
-env.hosts = [
-    '35.243.253.93',
-    '3.81.226.200'
-]
-
-env.user = "ubuntu"
+env.hosts = ['35.243.253.93', '3.81.226.200']
 
 
 def do_pack():
-    """ This function generates a .tgz archive from the
-        contents of the web_static folder """
-    date = datetime.now().strftime("%Y%m%d%H%M%S")
-    name = 'web_static_' + date + '.tgz'
-    local('mkdir -p versions/')
-    descompress = local('tar -zcvf versions/{} web_static'.format(name))
-    if descompress.failed:
-        return None
-    return 'versions/' + name
+    """ script that generates a .tgz archive from the
+    contents of the web_static folder of your AirBnB
+    Clone repo, using the function do_pack
+    """
+    from fabric.api import local
+    from datetime import datetime
+    from fabric.context_managers import cd
+    import os.path
+
+    now = datetime.now()
+    dt_string = now.strftime("%Y%m%d%H%M%S")
+    file_name = 'web_static_' + dt_string
+    source_dir = 'web_static'
+
+    if not os.path.exists('versions'):
+        local("mkdir -p versions")
+    local("tar -zcvf versions/%s.tgz --absolute-names %s" %
+          (file_name, source_dir))
+    path_file = 'versions' + '/' + file_name + '.tgz'
+
+    if os.path.exists(path_file):
+        (path_file)
+    else:
+        return(None)
 
 
 def do_deploy(archive_path):
-    """ This function distributes an archive to your web servers """
-    name_file = archive_path.split('/')[1][:-4]
+    """script that distributes an archive to your web servers,
+    using the function do_deploy
+    """
+    file_name = str(archive_path.replace('versions/', ''))
+
+    just_name = file_name.replace('.tgz', '')
+    path_releases = "/data/web_static/releases"
+    path_current = "/data/web_static/current"
+    full_path = path_releases + "/" + just_name
+    wb_st = "/web_static"
+
     if not isfile(archive_path):
-        return False
-    upload = put(archive_path, "/tmp/{}.tgz".format(name_file))
-    if upload.failed:
-        return False
-    create = run('mkdir -p /data/web_static/releases/{}/'.format(name_file))
-    if create.failed:
-        return False
-    descompress = run('tar -xzf /tmp/{}.tgz -C /data/\
-web_static/releases/{}/'.format(name_file, name_file))
-    if descompress.failed:
-        return False
-    delete = run('rm /tmp/{}.tgz'.format(name_file))
-    if delete.failed:
-        return False
-    move = run('mv /data/web_static/releases/{}/web_static/* \
-/data/web_static/releases/{}/'.format(name_file, name_file))
-    if move.failed:
-        return False
-    o_del = run('rm -rf /data/web_static/releases/{}/\
-web_static'.format(name_file))
-    if o_del.failed:
-        return False
-    sym_l_del = run('rm -rf /data/web_static/current')
-    if sym_l_del.failed:
-        return False
-    symbolic = run('ln -s {} /data/web_static/current'.format(name_file))
-    if symbolic.failed:
-        return False
-    return True
+        return (False)
+
+    try:
+        put(archive_path, "/tmp/" + file_name)
+        run("mkdir -p " + path_releases + "/" + just_name + "/")
+        run("tar -xzf /tmp/" + file_name + " -C " + full_path + "/")
+        run("rm /tmp/" + file_name)
+        run("mv " + full_path + wb_st + "/* " + full_path + "/")
+        run("rm -rf " + full_path + wb_st)
+        run("rm -rf /data/web_static/current")
+        run("ln -s " + full_path + "/ /data/web_static/current")
+        return(True)
+    except:
+        return (False)
