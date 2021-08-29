@@ -11,30 +11,29 @@ env.hosts = ['35.243.253.93', '3.81.226.200']
 
 
 def do_pack():
-    """ script that generates a .tgz archive from the
-    contents of the web_static folder of your AirBnB
-    Clone repo, using the function do_pack
+    """Fabric script that generates a .tgz archive from the contents
+    of the web_static folder
     """
-    from fabric.api import local
-    from datetime import datetime
-    from fabric.context_managers import cd
+
+    import tarfile
     import os.path
+    from datetime import datetime
+    from fabric.api import local
 
-    now = datetime.now()
-    dt_string = now.strftime("%Y%m%d%H%M%S")
-    file_name = 'web_static_' + dt_string
-    source_dir = 'web_static'
+    folder_to_save = 'versions'
+    time_format = datetime.now().strftime("%Y%m%d%H%M%S")
+    tar_file = 'web_static_{}.tgz'.format(time_format)
 
-    if not os.path.exists('versions'):
-        local("mkdir -p versions")
-    local("tar -zcvf versions/%s.tgz --absolute-names %s" %
-          (file_name, source_dir))
-    path_file = 'versions' + '/' + file_name + '.tgz'
+    if not os.path.exists(folder_to_save):
+        os.mkdir(folder_to_save)
 
-    if os.path.exists(path_file):
-        (path_file)
+    with tarfile.open(folder_to_save + '/' + tar_file, "w:gz") as tar:
+        tar.add('web_static', arcname=os.path.basename('web_static'))
+
+    if os.path.exists(folder_to_save + '/' + tar_file):
+        return folder_to_save + '/' + tar_file
     else:
-        return(None)
+        return None
 
 
 def do_deploy(archive_path):
