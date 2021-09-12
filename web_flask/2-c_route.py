@@ -43,4 +43,5 @@ def c_parmeter(text):
     return 'C ' + formatted_text
 
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

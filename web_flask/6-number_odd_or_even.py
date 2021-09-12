@@ -107,4 +107,5 @@ def number_odd_or_even_n(n):
                            even_or_odd=even_or_odd)
 
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

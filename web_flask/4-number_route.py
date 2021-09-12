@@ -75,4 +75,5 @@ def number_int_parameter(n):
     return str(n) + ' is a number'
 
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

@@ -80,4 +80,5 @@ def number_template_n(n):
     return render_template('5-number.html', n=n)
 
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
