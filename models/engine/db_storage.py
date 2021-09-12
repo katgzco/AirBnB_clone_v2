@@ -47,16 +47,8 @@ class DBStorage():
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """add the object to the current database session
-        Args:
-            cls (class):for query on the current database session
-            all objects depending of it  name
+        """query on the current database session"""
 
-        Returns:
-           dict_to_return [Dict]: Objects dictionary
-        """
-
-        # imports
         from models.base_model import BaseModel
         from models.user import User
         from models.place import Place
@@ -65,38 +57,23 @@ class DBStorage():
         from models.amenity import Amenity
         from models.review import Review
 
-        # dict of class
-        classes = {
-            'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
-        }
+        classes = {"Amenity": Amenity, "City": City, "Place": Place,
+           "Review": Review, "State": State, "User": User}
 
-        instances = list()
-        if cls:
-            instances = self.__session.query(classes[cls]).all()
+        new_dict = {}
+        if cls is None:
+            for c in classes.values():
+                for obj in self.__session.query(c).all():
+                    key = type(obj).__name__ + "." + obj.id
+                    del obj.__dict__["_sa_instsance_state"]
+                    new_dict[key] = obj
         else:
-            for k in classes.keys():
-                try:
-                    if (self.__session.query(classes[k]).all()) != []:
-                        instances.extend(
-                            self.__session.query(classes[k]).all())
-                except:
-                    pass
+            for obj in self.__session.query(cls).all():
+                key = type(obj).__name__ + "." + obj.id
+                #del obj.__dict__["_sa_instance_state"]
+                new_dict[key] = obj
 
-        dict_to_return = {}
-
-        for object_ in instances:
-            # es posible que sea v['__class__']
-            name = object_.__class__.__name__
-            id = object_.__dict__['id']
-            key = name + '.' + id
-            if '_sa_instance_state' in object_.__dict__.keys():
-                del object_.__dict__['_sa_instance_state']
-            dict_to_return[key] = object_
-
-        return dict_to_return
-
+            return (new_dict)
     def new(self, obj):
         """add the object to the current database session
 
@@ -143,3 +120,7 @@ class DBStorage():
         Session = scoped_session(self.__session)
  #       Session = scoped_session(session)
         self.__session = Session()
+
+
+    def close(self):
+        self.__session.close()
