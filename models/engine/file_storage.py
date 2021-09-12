@@ -60,7 +60,10 @@ class FileStorage:
         '''delete obj from __objects if it’s inside'''
         if obj:
             key = obj.__class__.__name__ + '.' + obj.id
-            self.__objects.pop(key)
+            try:
+                self.__objects.pop(key)
+            except:
+                pass
 
     def close(self):
         ''' call reload() method for deserializing

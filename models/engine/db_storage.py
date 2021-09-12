@@ -58,7 +58,7 @@ class DBStorage():
         from models.review import Review
 
         classes = {"Amenity": Amenity, "City": City, "Place": Place,
-           "Review": Review, "State": State, "User": User}
+                   "Review": Review, "State": State, "User": User}
 
         new_dict = {}
         if cls is None:
@@ -74,6 +74,7 @@ class DBStorage():
                 new_dict[key] = obj
 
             return (new_dict)
+
     def new(self, obj):
         """add the object to the current database session
 
@@ -121,6 +122,6 @@ class DBStorage():
  #       Session = scoped_session(session)
         self.__session = Session()
 
-
     def close(self):
+        """Close sesssion"""
         self.__session.close()
