@@ -4,6 +4,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
+
 from os import getenv
 # parent
 
@@ -21,16 +22,18 @@ class State(BaseModel, Base):
         cities = relationship('City', back_populates='state',
                               cascade='all, delete, delete-orphan')
     else:
-        #        @ property
+        @property
         def cities(self):
-            from models.engine import storage
+            """returns a list of City instaces"""
+            from models import storage
+            from models.city import City
             # dictionary of objects of City CLass
-            dict_ = storage.all('City')
+            dict_ = storage.all(City)
             # list de ciudades que contiene el state_id == Satae.id
             list_ = []
-            for k, v in dict_.items():
+            for v in dict_.values():
                 # v es un objeto, porlo tanto debemos acceder
                 # a los valores de su dccionario
-                if self.id in v.__dict__.values():
+                if self.id == v.__dict__.values():
                     list_.append(v)
             return list_
