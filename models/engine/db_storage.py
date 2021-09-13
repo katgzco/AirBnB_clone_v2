@@ -40,9 +40,10 @@ class DBStorage():
             'mysql+mysqldb://{}:{}@{}/{}'.format(env_vars['HBNB_MYSQL_USER'],
                                                  env_vars['HBNB_MYSQL_PWD'],
                                                  env_vars['HBNB_MYSQL_HOST'],
-                                                 env_vars['HBNB_MYSQL_DB']), pool_pre_ping=True)
+                                                 env_vars['HBNB_MYSQL_DB']),
+            pool_pre_ping=True)
 
-   # Eliminar las tablas? -> defininedo un ambiente diferente o no cre
+# Eliminar las tablas? -> defininedo un ambiente diferente o no cre
         if (env_vars['HBNB_ENV'] == 'test'):
             Base.metadata.drop_all(self.__engine)
 
@@ -70,7 +71,7 @@ class DBStorage():
         else:
             for obj in self.__session.query(cls).all():
                 key = type(obj).__name__ + "." + obj.id
-                #del obj.__dict__["_sa_instance_state"]
+                # del obj.__dict__["_sa_instance_state"]
                 new_dict[key] = obj
 
             return (new_dict)
@@ -119,7 +120,7 @@ class DBStorage():
             bind=self.__engine, expire_on_commit=False)
         # Possible bug -> check the scopped session
         Session = scoped_session(self.__session)
- #       Session = scoped_session(session)
+        # Session = scoped_session(session)
         self.__session = Session()
 
     def close(self):
