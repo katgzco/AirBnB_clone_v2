@@ -34,6 +34,6 @@ class State(BaseModel, Base):
             for v in dict_.values():
                 # v es un objeto, porlo tanto debemos acceder
                 # a los valores de su dccionario
-                if self.id == v.__dict__.values():
+                if self.id in v.__dict__.values():
                     list_.append(v)
             return list_
